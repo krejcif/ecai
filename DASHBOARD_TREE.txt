@@ -1,0 +1,144 @@
+EcommerceIQ Dashboard - File Structure
+=======================================
+
+/home/user/ecai/
+│
+├── DASHBOARD.md                    # Main dashboard guide (11KB)
+├── DASHBOARD_SUMMARY.txt           # Quick reference summary
+├── package.json                    # Updated with new deps & scripts
+│
+├── src/
+│   └── dashboard/                  # Dashboard directory
+│       ├── index.html              # ⭐ Main dashboard (33KB, single-file)
+│       ├── static-server.ts        # ⭐ Express server with API proxy (5.3KB)
+│       ├── demo-data.ts            # Sample data for testing (7.9KB)
+│       ├── config.json             # Configuration file (1.3KB)
+│       ├── README.md               # Usage documentation (7.3KB)
+│       ├── FEATURES.md             # Visual design reference (9.2KB)
+│       └── API.md                  # API endpoint docs (8.3KB)
+│
+└── scripts/
+    └── start-all.sh                # ⭐ Start both API & Dashboard (executable)
+
+Key Files (⭐)
+==============
+
+1. index.html (33KB)
+   - Single-file web dashboard
+   - Modern dark theme UI
+   - Tailwind CSS + Alpine.js + Chart.js (CDN)
+   - 8 major sections:
+     ✓ Navigation header
+     ✓ Search bar
+     ✓ Metrics cards (4)
+     ✓ Trending products
+     ✓ Price intelligence chart
+     ✓ Sentiment analysis chart
+     ✓ Risk assessment
+     ✓ Data ingestion stats
+
+2. static-server.ts (5.3KB)
+   - Express.js server
+   - Serves index.html
+   - Proxies /api/* to backend
+   - SPA routing support
+   - Health check endpoint
+   - Graceful shutdown
+
+3. start-all.sh (2.8KB)
+   - Starts API (port 3000)
+   - Starts Dashboard (port 3001)
+   - Environment setup
+   - Graceful cleanup
+
+Dependencies Added
+==================
+
+package.json changes:
+  ✓ http-proxy-middleware: ^2.0.6
+  ✓ @types/http-proxy-middleware: ^1.0.0
+
+Scripts added:
+  ✓ dashboard: tsx src/dashboard/static-server.ts
+  ✓ dashboard:dev: tsx watch src/dashboard/static-server.ts
+  ✓ start:all: bash scripts/start-all.sh
+
+Quick Commands
+==============
+
+Install:
+  $ npm install
+
+Start Dashboard Only:
+  $ npm run dashboard:dev
+
+Start Everything:
+  $ npm run start:all
+
+Visit:
+  http://localhost:3001
+
+Health Check:
+  http://localhost:3001/health
+
+Dashboard Sections
+==================
+
+┌─────────────────────────────────────────┐
+│         Navigation Header               │
+│  EcommerceIQ  [Menu]  🟢 Connected      │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│      🔍 Search Bar (Semantic AI)        │
+└─────────────────────────────────────────┘
+
+┌───────┬───────┬───────┬───────┐
+│  📦   │  🏷️   │  🌐   │  😊   │
+│ 15.2K │   24  │   8   │  7.8  │
+└───────┴───────┴───────┴───────┘
+
+┌──────────────┬──────────────┐
+│  📈 Trending │  💰 Pricing  │
+│   Products   │   Charts     │
+└──────────────┴──────────────┘
+
+┌──────┬──────┬──────┐
+│ 😊   │ ⚠️   │ 📥   │
+│Senti │ Risk │Ingest│
+└──────┴──────┴──────┘
+
+Technology Stack
+================
+
+Frontend (CDN):
+  • Tailwind CSS 3.x
+  • Alpine.js 3.x (15KB)
+  • Chart.js 4.4
+
+Backend:
+  • Express.js 4.18
+  • TypeScript 5.3
+  • Node.js >= 18
+
+Architecture
+============
+
+Browser (3001)
+    ↓
+Static Server (Express)
+    │
+    ├── Serve index.html
+    │
+    └── Proxy /api/* → API Server (3000)
+
+Documentation
+=============
+
+Main:      /home/user/ecai/DASHBOARD.md
+Usage:     /home/user/ecai/src/dashboard/README.md
+Features:  /home/user/ecai/src/dashboard/FEATURES.md
+API Docs:  /home/user/ecai/src/dashboard/API.md
+Summary:   /home/user/ecai/DASHBOARD_SUMMARY.txt
+
+Status: ✅ PRODUCTION READY

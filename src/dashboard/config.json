@@ -1,0 +1,67 @@
+{
+  "dashboard": {
+    "title": "EcommerceIQ",
+    "description": "AI-Powered Ecommerce Intelligence Platform",
+    "version": "1.0.0",
+    "theme": {
+      "mode": "dark",
+      "primary": "#8b5cf6",
+      "secondary": "#3b82f6",
+      "accent": "#ec4899"
+    },
+    "features": {
+      "search": {
+        "enabled": true,
+        "semantic": true,
+        "threshold": 0.7
+      },
+      "trending": {
+        "enabled": true,
+        "limit": 10,
+        "refreshInterval": 30000
+      },
+      "charts": {
+        "enabled": true,
+        "types": ["line", "doughnut", "bar"]
+      },
+      "realtime": {
+        "enabled": true,
+        "updateInterval": 30000
+      }
+    },
+    "api": {
+      "baseUrl": "/api",
+      "timeout": 10000,
+      "retries": 3
+    },
+    "pagination": {
+      "defaultLimit": 20,
+      "maxLimit": 100
+    },
+    "cache": {
+      "enabled": true,
+      "ttl": 300000
+    }
+  },
+  "server": {
+    "port": 3001,
+    "host": "0.0.0.0",
+    "cors": {
+      "enabled": true,
+      "origins": ["*"]
+    },
+    "rateLimit": {
+      "windowMs": 60000,
+      "max": 100
+    },
+    "compression": {
+      "enabled": true,
+      "level": 6
+    }
+  },
+  "logging": {
+    "level": "info",
+    "format": "combined",
+    "enabled": true
+  }
+}
