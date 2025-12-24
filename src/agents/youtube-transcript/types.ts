@@ -59,6 +59,7 @@ export interface AgentConfig {
   email: EmailConfig;
   openaiApiKey?: string;
   anthropicApiKey?: string;
+  youtubeApiKey?: string;
   aiProvider: 'openai' | 'anthropic' | 'local';
   aiModel: string;
   checkInterval?: number; // in minutes

@@ -36,7 +36,7 @@ export class YouTubeTranscriptEmailAgent extends EventEmitter {
       path.join(process.cwd(), 'data', 'processed-videos.json');
 
     // Initialize services
-    this.youtubeService = new YouTubeChannelService(config.channelUrl);
+    this.youtubeService = new YouTubeChannelService(config.channelUrl, config.youtubeApiKey);
     this.transcriptExtractor = new TranscriptExtractor(config.language || 'en');
     this.summarizer = new Summarizer({
       provider: config.aiProvider,

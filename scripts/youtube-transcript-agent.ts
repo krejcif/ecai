@@ -94,6 +94,7 @@ program
       aiModel: process.env.AI_MODEL || (aiProvider === 'anthropic' ? 'claude-3-haiku-20240307' : 'gpt-4o-mini'),
       openaiApiKey: process.env.OPENAI_API_KEY,
       anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+      youtubeApiKey: process.env.YOUTUBE_API_KEY,
       checkInterval: parseInt(options.interval, 10),
       email: {
         host: process.env.SMTP_HOST || '',
@@ -126,6 +127,7 @@ program
     console.log(chalk.gray(`  Language: ${options.language}`));
     console.log(chalk.gray(`  AI Provider: ${aiProvider}`));
     console.log(chalk.gray(`  AI Model: ${config.aiModel}`));
+    console.log(chalk.gray(`  YouTube API: ${config.youtubeApiKey ? 'configured' : 'not set (using RSS fallback)'}`));
     if (!options.dryRun) {
       console.log(chalk.gray(`  Email to: ${config.email.to.join(', ')}`));
     }
