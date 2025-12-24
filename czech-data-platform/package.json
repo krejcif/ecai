@@ -1,0 +1,36 @@
+{
+  "name": "czech-data-platform",
+  "version": "1.0.0",
+  "description": "Czech Open Data Platform - Comprehensive data fetching and processing system for Czech government data sources",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "tsc",
+    "demo": "npx tsx src/examples/demo.ts",
+    "demo:standalone": "npx tsx src/demo/standalone.ts",
+    "demo:live": "npx tsx src/demo/liveDemo.ts",
+    "demo:analytics": "npx tsx src/examples/analyticsDemo.ts",
+    "test-processor": "npx tsx src/examples/testProcessor.ts",
+    "dev": "ts-node src/examples/demo.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "proof": "npx tsx src/demo/proofOfValue.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "node-fetch": "^3.3.2",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  }
+}
