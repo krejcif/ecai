@@ -19,7 +19,9 @@
     "dashboard:dev": "tsx watch src/dashboard/static-server.ts",
     "start:all": "bash scripts/start-all.sh",
     "type-check": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "youtube-agent": "tsx scripts/youtube-transcript-agent.ts",
+    "youtube-agent:watch": "tsx scripts/youtube-transcript-agent.ts --watch"
   },
   "keywords": [
     "ecommerce",
@@ -45,8 +47,10 @@
     "helmet": "^7.1.0",
     "http-proxy-middleware": "^2.0.9",
     "morgan": "^1.10.1",
+    "nodemailer": "^7.0.12",
     "ora": "^8.0.1",
     "uuid": "^9.0.1",
+    "youtube-transcript": "^1.2.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -54,6 +58,7 @@
     "@types/express": "^4.17.21",
     "@types/http-proxy-middleware": "^1.0.0",
     "@types/node": "^20.10.6",
+    "@types/nodemailer": "^7.0.4",
     "@types/uuid": "^9.0.7",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"

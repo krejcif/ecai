@@ -1,0 +1,198 @@
+/**
+ * Email Sender Service
+ * Sends video summaries via email
+ */
+
+import nodemailer from 'nodemailer';
+import { EmailConfig, VideoSummary } from './types';
+import { logger } from '../../utils';
+
+export class EmailSender {
+  private config: EmailConfig;
+  private transporter: nodemailer.Transporter;
+
+  constructor(config: EmailConfig) {
+    this.config = config;
+    this.transporter = nodemailer.createTransport({
+      host: config.host,
+      port: config.port,
+      secure: config.secure,
+      auth: config.auth,
+    });
+  }
+
+  /**
+   * Verify email connection
+   */
+  async verify(): Promise<boolean> {
+    try {
+      await this.transporter.verify();
+      logger.info('Email connection verified successfully');
+      return true;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error(`Email connection verification failed: ${errorMessage}`);
+      return false;
+    }
+  }
+
+  /**
+   * Send summary email for multiple videos
+   */
+  async sendSummaryEmail(summaries: VideoSummary[], channelName: string): Promise<boolean> {
+    if (summaries.length === 0) {
+      logger.info('No summaries to send');
+      return false;
+    }
+
+    const subject = `📺 YouTube Summary: ${summaries.length} new video${summaries.length > 1 ? 's' : ''} from ${channelName}`;
+    const html = this.generateEmailHtml(summaries, channelName);
+    const text = this.generateEmailText(summaries, channelName);
+
+    try {
+      const info = await this.transporter.sendMail({
+        from: this.config.from,
+        to: this.config.to.join(', '),
+        subject,
+        text,
+        html,
+      });
+
+      logger.info('Summary email sent successfully', { messageId: info.messageId });
+      return true;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error(`Failed to send summary email: ${errorMessage}`);
+      return false;
+    }
+  }
+
+  /**
+   * Generate HTML email content
+   */
+  private generateEmailHtml(summaries: VideoSummary[], channelName: string): string {
+    const videoSections = summaries.map((summary) => `
+      <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #ff0000;">
+        <h2 style="margin: 0 0 10px 0; color: #1a1a1a;">
+          <a href="${summary.videoUrl}" style="color: #1a1a1a; text-decoration: none;">
+            ${this.escapeHtml(summary.videoTitle)}
+          </a>
+        </h2>
+        <p style="color: #666; font-size: 14px; margin: 0 0 15px 0;">
+          ${summary.duration ? `⏱️ ${summary.duration} | ` : ''}📅 ${this.formatDate(summary.publishedAt)}
+        </p>
+
+        <h3 style="color: #333; margin: 15px 0 10px 0; font-size: 16px;">📝 Summary</h3>
+        <p style="color: #444; line-height: 1.6; margin: 0 0 15px 0;">
+          ${this.escapeHtml(summary.summary)}
+        </p>
+
+        <h3 style="color: #333; margin: 15px 0 10px 0; font-size: 16px;">🎯 Key Points</h3>
+        <ul style="color: #444; line-height: 1.8; margin: 0; padding-left: 20px;">
+          ${summary.keyPoints.map((point) => `<li>${this.escapeHtml(point)}</li>`).join('')}
+        </ul>
+
+        ${summary.topics.length > 0 ? `
+          <div style="margin-top: 15px;">
+            <span style="color: #666; font-size: 14px;">🏷️ Topics: </span>
+            ${summary.topics.map((topic) =>
+              `<span style="display: inline-block; background: #e9ecef; padding: 3px 10px; border-radius: 12px; margin: 2px 4px 2px 0; font-size: 13px;">${this.escapeHtml(topic)}</span>`
+            ).join('')}
+          </div>
+        ` : ''}
+
+        <div style="margin-top: 20px;">
+          <a href="${summary.videoUrl}" style="display: inline-block; background: #ff0000; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+            ▶️ Watch Video
+          </a>
+        </div>
+      </div>
+    `).join('');
+
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; max-width: 700px; margin: 0 auto; padding: 20px; background: #ffffff;">
+        <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
+          <h1 style="color: #ff0000; margin: 0;">📺 YouTube Video Summaries</h1>
+          <p style="color: #666; margin: 10px 0 0 0;">Channel: <strong>${this.escapeHtml(channelName)}</strong></p>
+        </div>
+
+        ${videoSections}
+
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #999; font-size: 12px;">
+          <p>Generated by YouTube Transcript Email Agent</p>
+          <p>📧 ${new Date().toLocaleDateString('cs-CZ', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}</p>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  /**
+   * Generate plain text email content
+   */
+  private generateEmailText(summaries: VideoSummary[], channelName: string): string {
+    const header = `YouTube Video Summaries\nChannel: ${channelName}\n${'='.repeat(50)}\n\n`;
+
+    const videoSections = summaries.map((summary) => {
+      const lines = [
+        summary.videoTitle,
+        '-'.repeat(40),
+        `URL: ${summary.videoUrl}`,
+        summary.duration ? `Duration: ${summary.duration}` : '',
+        `Published: ${this.formatDate(summary.publishedAt)}`,
+        '',
+        'SUMMARY:',
+        summary.summary,
+        '',
+        'KEY POINTS:',
+        ...summary.keyPoints.map((point) => `  • ${point}`),
+        '',
+        summary.topics.length > 0 ? `Topics: ${summary.topics.join(', ')}` : '',
+        '',
+      ];
+
+      return lines.filter(Boolean).join('\n');
+    }).join('\n' + '='.repeat(50) + '\n\n');
+
+    return header + videoSections;
+  }
+
+  /**
+   * Format date for display
+   */
+  private formatDate(date: Date): string {
+    return date.toLocaleDateString('cs-CZ', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
+
+  /**
+   * Escape HTML special characters
+   */
+  private escapeHtml(text: string): string {
+    const htmlEntities: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+
+    return text.replace(/[&<>"']/g, (char) => htmlEntities[char]);
+  }
+}
