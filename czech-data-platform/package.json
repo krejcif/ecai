@@ -17,7 +17,8 @@
     "dev": "ts-node src/examples/demo.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "proof": "npx tsx src/demo/proofOfValue.ts"
+    "proof": "npx tsx src/demo/proofOfValue.ts",
+    "report": "npx tsx src/demo/dailyReport.ts"
   },
   "keywords": [],
   "author": "",
