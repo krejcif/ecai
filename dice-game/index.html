@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kostka - Clovece, nezlob se!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .dice-container {
+            perspective: 600px;
+            margin: 30px auto;
+        }
+
+        .dice {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            border-radius: 20px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            padding: 15px;
+            gap: 5px;
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.2),
+                inset 0 2px 10px rgba(255,255,255,0.8);
+            transition: transform 0.1s ease;
+            cursor: pointer;
+        }
+
+        .dice:hover {
+            transform: scale(1.05);
+        }
+
+        .dice.rolling {
+            animation: roll 0.5s ease-out;
+        }
+
+        @keyframes roll {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            25% { transform: rotateX(180deg) rotateY(90deg); }
+            50% { transform: rotateX(360deg) rotateY(180deg); }
+            75% { transform: rotateX(540deg) rotateY(270deg); }
+            100% { transform: rotateX(720deg) rotateY(360deg); }
+        }
+
+        .dot {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: transparent;
+            transition: background 0.3s ease;
+        }
+
+        .dot.visible {
+            background: linear-gradient(145deg, #e63946, #c1121f);
+            box-shadow:
+                inset 0 2px 4px rgba(255,255,255,0.3),
+                0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .result {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #764ba2;
+            margin: 20px 0;
+            text-shadow: 2px 2px 0 #e6e6e6;
+        }
+
+        .roll-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .roll-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .roll-btn:active {
+            transform: translateY(0);
+        }
+
+        .roll-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .history {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .history h3 {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #764ba2;
+            font-size: 1.1rem;
+        }
+
+        .history-item.six {
+            background: linear-gradient(145deg, #ffd700, #ffb700);
+            color: #333;
+        }
+
+        .stats {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .hint {
+            margin-top: 20px;
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+
+        .six-celebration {
+            animation: celebrate 0.5s ease;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .game-container {
+                padding: 25px;
+            }
+
+            .dice {
+                width: 120px;
+                height: 120px;
+                padding: 12px;
+            }
+
+            .result {
+                font-size: 3rem;
+            }
+
+            .roll-btn {
+                padding: 12px 40px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Kostka</h1>
+
+    <div class="game-container">
+        <p style="color: #888; margin-bottom: 10px;">Pro Clovece, nezlob se!</p>
+
+        <div class="dice-container">
+            <div class="dice" id="dice" onclick="rollDice()">
+                <div class="dot" data-pos="1"></div>
+                <div class="dot" data-pos="2"></div>
+                <div class="dot" data-pos="3"></div>
+                <div class="dot" data-pos="4"></div>
+                <div class="dot" data-pos="5"></div>
+                <div class="dot" data-pos="6"></div>
+                <div class="dot" data-pos="7"></div>
+                <div class="dot" data-pos="8"></div>
+                <div class="dot" data-pos="9"></div>
+            </div>
+        </div>
+
+        <div class="result" id="result">?</div>
+
+        <button class="roll-btn" id="rollBtn" onclick="rollDice()">
+            Hodit!
+        </button>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalRolls">0</div>
+                <div>Hodu</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="avgRoll">-</div>
+                <div>Prumer</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="sixCount">0</div>
+                <div>Sestek</div>
+            </div>
+        </div>
+
+        <div class="history">
+            <h3>Historie hodu</h3>
+            <div class="history-list" id="historyList">
+                <span style="color: #ccc;">Zatim zadne hody</span>
+            </div>
+        </div>
+
+        <p class="hint">Stiskni MEZERNIK nebo klikni pro hod</p>
+    </div>
+
+    <script>
+        // Dice dot patterns - positions 1-9 in 3x3 grid
+        const patterns = {
+            1: [5],                     // center
+            2: [1, 9],                  // corners
+            3: [1, 5, 9],               // diagonal
+            4: [1, 3, 7, 9],            // all corners
+            5: [1, 3, 5, 7, 9],         // corners + center
+            6: [1, 3, 4, 6, 7, 9]       // two columns
+        };
+
+        let history = [];
+        let isRolling = false;
+
+        function showDice(value) {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach(dot => dot.classList.remove('visible'));
+
+            patterns[value].forEach(pos => {
+                const dot = document.querySelector(`.dot[data-pos="${pos}"]`);
+                if (dot) dot.classList.add('visible');
+            });
+        }
+
+        function rollDice() {
+            if (isRolling) return;
+
+            isRolling = true;
+            const dice = document.getElementById('dice');
+            const result = document.getElementById('result');
+            const rollBtn = document.getElementById('rollBtn');
+
+            rollBtn.disabled = true;
+            dice.classList.add('rolling');
+            result.textContent = '?';
+
+            // Animate through random values
+            let animationCount = 0;
+            const animationInterval = setInterval(() => {
+                const randomValue = Math.floor(Math.random() * 6) + 1;
+                showDice(randomValue);
+                animationCount++;
+
+                if (animationCount > 10) {
+                    clearInterval(animationInterval);
+                }
+            }, 50);
+
+            // Final result
+            setTimeout(() => {
+                clearInterval(animationInterval);
+                dice.classList.remove('rolling');
+
+                const finalValue = Math.floor(Math.random() * 6) + 1;
+                showDice(finalValue);
+                result.textContent = finalValue;
+
+                // Celebrate six!
+                if (finalValue === 6) {
+                    result.classList.add('six-celebration');
+                    setTimeout(() => result.classList.remove('six-celebration'), 500);
+                }
+
+                // Update history
+                history.push(finalValue);
+                updateHistory();
+                updateStats();
+
+                rollBtn.disabled = false;
+                isRolling = false;
+            }, 500);
+        }
+
+        function updateHistory() {
+            const historyList = document.getElementById('historyList');
+            const recentHistory = history.slice(-20); // Last 20 rolls
+
+            historyList.innerHTML = recentHistory.map(value =>
+                `<div class="history-item ${value === 6 ? 'six' : ''}">${value}</div>`
+            ).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('totalRolls').textContent = history.length;
+
+            if (history.length > 0) {
+                const avg = (history.reduce((a, b) => a + b, 0) / history.length).toFixed(1);
+                document.getElementById('avgRoll').textContent = avg;
+            }
+
+            const sixes = history.filter(v => v === 6).length;
+            document.getElementById('sixCount').textContent = sixes;
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                rollDice();
+            }
+        });
+
+        // Initial display
+        showDice(1);
+    </script>
+</body>
+</html>
